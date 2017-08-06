@@ -24,16 +24,11 @@ func ToLowerCamelCase(text []string) string {
 	first := true
 	r := make([]string, 0, len(text))
 	for _, t := range text {
-		for _, s := range strings.Split(strings.ToLower(t), " ") {
-			if len(s) <= 0 {
-				continue
-			}
-			if first {
-				r = append(r, s)
-				first = false
-			} else {
-				r = append(r, strings.Title(s))
-			}
+		if first {
+			r = append(r, strings.ToLower(t))
+			first = false
+		} else {
+			r = append(r, strings.Title(strings.ToLower(t)))
 		}
 	}
 	return strings.Join(r, "")
@@ -42,12 +37,7 @@ func ToLowerCamelCase(text []string) string {
 func ToUpperCamelCase(text []string) string {
 	r := make([]string, 0, len(text))
 	for _, t := range text {
-		for _, s := range strings.Split(strings.ToLower(t), " ") {
-			if len(s) <= 0 {
-				continue
-			}
-			r = append(r, strings.Title(s))
-		}
+		r = append(r, strings.Title(strings.ToLower(t)))
 	}
 	return strings.Join(r, "")
 }
@@ -55,12 +45,7 @@ func ToUpperCamelCase(text []string) string {
 func ToLowerSnakeCase(text []string) string {
 	r := make([]string, 0, len(text))
 	for _, t := range text {
-		for _, s := range strings.Split(strings.ToLower(t), " ") {
-			if len(s) <= 0 {
-				continue
-			}
-			r = append(r, s)
-		}
+		r = append(r, strings.ToLower(t))
 	}
 	return strings.Join(r, "_")
 }
@@ -68,12 +53,7 @@ func ToLowerSnakeCase(text []string) string {
 func ToUpperSnakeCase(text []string) string {
 	r := make([]string, 0, len(text))
 	for _, t := range text {
-		for _, s := range strings.Split(strings.ToUpper(t), " ") {
-			if len(s) <= 0 {
-				continue
-			}
-			r = append(r, s)
-		}
+		r = append(r, strings.ToUpper(t))
 	}
 	return strings.Join(r, "_")
 }

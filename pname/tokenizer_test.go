@@ -20,12 +20,12 @@ import (
 	"testing"
 )
 
-func createDict() map[string]string {
-	dict := make(map[string]string)
-	dict["a"] = "A"
-	dict["aa"] = "AA"
-	dict["b"] = "B"
-	dict["bb"] = "BB"
+func createDict() map[string][]string {
+	dict := make(map[string][]string)
+	dict["a"] = []string{"A"}
+	dict["aa"] = []string{"AA"}
+	dict["b"] = []string{"B"}
+	dict["bb"] = []string{"BB"}
 	return dict
 }
 
@@ -65,7 +65,7 @@ func TestSplitText(t *testing.T) {
 	assertBool(t, false, tk1[7].OK)
 }
 
-func assertFindLongestToken(t *testing.T, dict map[string]string, text string, expected string) {
+func assertFindLongestToken(t *testing.T, dict map[string][]string, text string, expected string) {
 	r := findLongestToken(text, dict)
 	if r.Word != expected {
 		t.Errorf("should be %s for %s", expected, text)

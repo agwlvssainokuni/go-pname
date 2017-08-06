@@ -30,7 +30,9 @@ func main() {
 
 	var (
 		paramDictFile   string
+		paramDictDelim  string
 		paramOutputFile string
+		paramTsvStdio   bool
 		paramLowerCamel bool
 		paramUpperCamel bool
 		paramLowerSnake bool
@@ -38,7 +40,9 @@ func main() {
 	)
 
 	flag.StringVar(&paramDictFile, "d", "dict.csv", "単語辞書ファイルのパス")
-	flag.StringVar(&paramOutputFile, "o", "result.csv", "結果を出力するファイルのパス")
+	flag.StringVar(&paramDictDelim, "D", " ", "単語辞書の分離文字")
+	flag.StringVar(&paramOutputFile, "o", "", "結果を出力するファイルのパス")
+	flag.BoolVar(&paramTsvStdio, "T", false, "標準入出力をTSV形式とする")
 	flag.BoolVar(&paramLowerCamel, "c", false, "camelCase")
 	flag.BoolVar(&paramUpperCamel, "C", false, "CamelCase")
 	flag.BoolVar(&paramLowerSnake, "s", false, "snake_case")
@@ -46,104 +50,99 @@ func main() {
 	flag.Parse()
 
 	var tokenizer pname.Tokenizer
-	if dict, err := pname.LoadDictFile(paramDictFile, false); err != nil {
+	if dict, err := pname.LoadDictFile(paramDictFile, false, paramDictDelim); err != nil {
 		fmt.Fprintf(os.Stderr, "単語辞書ファイル読み込みエラー: %s\n", err.Error())
 		os.Exit(-1)
 	} else {
 		tokenizer = pname.NewDictTokenizer(dict)
 	}
 
-	if writer, err := os.Create(paramOutputFile); err != nil {
-		fmt.Fprintf(os.Stderr, "結果ファイル出力エラー: %s\n", err.Error())
-		os.Exit(-1)
+	getPname := pname.GetPnameFunc(paramLowerCamel, paramUpperCamel, paramLowerSnake, paramUpperSnake)
+	getDesc := pname.GetDescFunc()
+
+	var (
+		writer, reader *os.File
+		csvw           *csv.Writer
+		csvr           *csv.Reader
+		err            error
+	)
+
+	if len(paramOutputFile) <= 0 {
+
+		csvw = csv.NewWriter(os.Stdout)
+		if paramTsvStdio {
+			csvw.Comma = '\t'
+		}
 	} else {
 
-		csvw := csv.NewWriter(writer)
+		if writer, err = os.Create(paramOutputFile); err != nil {
+			fmt.Fprintf(os.Stderr, "結果出力エラー: %s\n", err.Error())
+			os.Exit(-1)
+		}
+
+		csvw = csv.NewWriter(writer)
 		if strings.HasSuffix(paramOutputFile, ".tsv") {
 			csvw.Comma = '\t'
 		}
-
-		for _, fname := range flag.Args() {
-			if lines, err := loadInputFile(fname); err != nil {
-				fmt.Fprintf(os.Stderr, "入力ファイル読み込みエラー: %s\n", err.Error())
-			} else {
-				for _, ln := range lines {
-					token := tokenizer.SplitText(ln)
-					pn := getPname(token, paramLowerCamel, paramUpperCamel, paramLowerSnake, paramUpperSnake)
-					desc := getDescription(token)
-					if err = csvw.Write([]string{ln, pn, desc}); err != nil {
-						fmt.Fprintf(os.Stderr, "結果ファイル出力エラー: %s\n", err.Error())
-						goto EXIT
-					}
-				}
-			}
-		}
-
-	EXIT:
-		csvw.Flush()
-		if err := csvw.Error(); err != nil {
-			fmt.Fprintf(os.Stderr, "結果ファイル出力エラー: %s\n", err.Error())
-			os.Exit(-1)
-		}
-		if err := writer.Close(); err != nil {
-			fmt.Fprintf(os.Stderr, "結果ファイル出力エラー: %s\n", err.Error())
-			os.Exit(-1)
-		}
 	}
-}
 
-func loadInputFile(fname string) ([]string, error) {
-	if reader, err := os.Open(fname); err != nil {
-		return nil, err
-	} else {
-		csvr := csv.NewReader(reader)
-		if strings.HasSuffix(fname, ".tsv") {
+	if len(flag.Args()) <= 0 {
+
+		csvr = csv.NewReader(os.Stdin)
+		if paramTsvStdio {
 			csvr.Comma = '\t'
 		}
-		if records, err := csvr.ReadAll(); err != nil {
-			return nil, err
-		} else {
-			if err = reader.Close(); err != nil {
-				return nil, err
-			}
-			result := make([]string, 0, len(records))
-			for _, r := range records {
-				if len(r) < 1 {
-					continue
-				}
-				result = append(result, r[0])
-			}
-			return result, nil
-		}
-	}
-}
 
-func getPname(token []*pname.Token, lCamel, uCamel, lSnake, uSnake bool) string {
-	t := make([]string, 0, len(token))
-	for _, tk := range token {
-		t = append(t, tk.Name)
-	}
-	if lCamel {
-		return pname.ToLowerCamelCase(t)
-	} else if uCamel {
-		return pname.ToUpperCamelCase(t)
-	} else if lSnake {
-		return pname.ToLowerSnakeCase(t)
-	} else if uSnake {
-		return pname.ToUpperSnakeCase(t)
+		var wrerr bool
+		if err, wrerr = pname.Process(csvr, csvw, tokenizer, getPname, getDesc); err != nil {
+			if wrerr {
+				fmt.Fprintf(os.Stderr, "結果出力エラー: %s\n", err.Error())
+			} else {
+				fmt.Fprintf(os.Stderr, "入力読込エラー: %s\n", err.Error())
+			}
+		}
 	} else {
-		return strings.Join(t, " ")
-	}
-}
 
-func getDescription(token []*pname.Token) string {
-	t := make([]string, 0, len(token))
-	for _, tk := range token {
-		if tk.OK {
-			t = append(t, fmt.Sprintf("%s=>%s", tk.Word, tk.Name))
-		} else {
-			t = append(t, fmt.Sprintf("%s=*", tk.Word))
+		for _, fname := range flag.Args() {
+			if reader, err = os.Open(fname); err != nil {
+				fmt.Fprintf(os.Stderr, "入力読込エラー: %s\n", err.Error())
+				continue
+			}
+
+			csvr = csv.NewReader(reader)
+			if strings.HasSuffix(fname, ".tsv") {
+				csvr.Comma = '\t'
+			}
+
+			var wrerr bool
+			if err, wrerr = pname.Process(csvr, csvw, tokenizer, getPname, getDesc); err != nil {
+				if wrerr {
+					fmt.Fprintf(os.Stderr, "結果出力エラー: %s\n", err.Error())
+				} else {
+					fmt.Fprintf(os.Stderr, "入力読込エラー: %s\n", err.Error())
+				}
+			}
+
+			if err = reader.Close(); err != nil {
+				fmt.Fprintf(os.Stderr, "入力読込エラー: %s\n", err.Error())
+			}
+
+			if wrerr {
+				goto EXIT
+			}
 		}
 	}
-	return strings.Join(t, ",")
+
+EXIT:
+	csvw.Flush()
+	if err = csvw.Error(); err != nil {
+		fmt.Fprintf(os.Stderr, "結果出力エラー: %s\n", err.Error())
+		os.Exit(-1)
+	}
+	if writer != nil {
+		if err = writer.Close(); err != nil {
+			fmt.Fprintf(os.Stderr, "結果出力エラー: %s\n", err.Error())
+			os.Exit(-1)
+		}
+	}
 }

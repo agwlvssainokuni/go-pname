@@ -26,15 +26,17 @@ func TestLoadDataCsv_0(t *testing.T) {
 	if f, err := dictFilepath("dict_0.csv"); err != nil {
 		t.Errorf("failed to dictFilepath() %s", err.Error())
 		return
-	} else if dict, err := LoadDictFile(f, false); err != nil {
+	} else if dict, err := LoadDictFile(f, false, " "); err != nil {
 		t.Errorf("failed to LoadDictCsv() %s", err.Error())
 		return
 	} else {
-		assertInt(t, 4, len(dict))
-		assertString(t, "A", dict["a"])
-		assertString(t, "AA", dict["aa"])
-		assertString(t, "B", dict["b"])
-		assertString(t, "BB", dict["bb"])
+		assertInt(t, 5, len(dict))
+		assertString(t, "A", dict["a"][0])
+		assertString(t, "AA", dict["aa"][0])
+		assertString(t, "B", dict["b"][0])
+		assertString(t, "BB", dict["bb"][0])
+		assertString(t, "C0", dict["cc"][0])
+		assertString(t, "C1", dict["cc"][1])
 	}
 }
 
@@ -42,15 +44,17 @@ func TestLoadDataCsv_1(t *testing.T) {
 	if f, err := dictFilepath("dict_1.csv"); err != nil {
 		t.Errorf("failed to dictFilepath() %s", err.Error())
 		return
-	} else if dict, err := LoadDictFile(f, true); err != nil {
+	} else if dict, err := LoadDictFile(f, true, " "); err != nil {
 		t.Errorf("failed to LoadDictCsv() %s", err.Error())
 		return
 	} else {
-		assertInt(t, 4, len(dict))
-		assertString(t, "A", dict["a"])
-		assertString(t, "AA", dict["aa"])
-		assertString(t, "B", dict["b"])
-		assertString(t, "BB", dict["bb"])
+		assertInt(t, 5, len(dict))
+		assertString(t, "A", dict["a"][0])
+		assertString(t, "AA", dict["aa"][0])
+		assertString(t, "B", dict["b"][0])
+		assertString(t, "BB", dict["bb"][0])
+		assertString(t, "C0", dict["cc"][0])
+		assertString(t, "C1", dict["cc"][1])
 	}
 }
 
@@ -58,15 +62,17 @@ func TestLoadDataTsv_0(t *testing.T) {
 	if f, err := dictFilepath("dict_0.tsv"); err != nil {
 		t.Errorf("failed to dictFilepath() %s", err.Error())
 		return
-	} else if dict, err := LoadDictFile(f, false); err != nil {
+	} else if dict, err := LoadDictFile(f, false, " "); err != nil {
 		t.Errorf("failed to LoadDictTsv() %s", err.Error())
 		return
 	} else {
-		assertInt(t, 4, len(dict))
-		assertString(t, "A", dict["a"])
-		assertString(t, "AA", dict["aa"])
-		assertString(t, "B", dict["b"])
-		assertString(t, "BB", dict["bb"])
+		assertInt(t, 5, len(dict))
+		assertString(t, "A", dict["a"][0])
+		assertString(t, "AA", dict["aa"][0])
+		assertString(t, "B", dict["b"][0])
+		assertString(t, "BB", dict["bb"][0])
+		assertString(t, "C0", dict["cc"][0])
+		assertString(t, "C1", dict["cc"][1])
 	}
 }
 
@@ -74,15 +80,17 @@ func TestLoadDataTsv_1(t *testing.T) {
 	if f, err := dictFilepath("dict_1.tsv"); err != nil {
 		t.Errorf("failed to dictFilepath() %s", err.Error())
 		return
-	} else if dict, err := LoadDictFile(f, true); err != nil {
+	} else if dict, err := LoadDictFile(f, true, " "); err != nil {
 		t.Errorf("failed to LoadDictTsv() %s", err.Error())
 		return
 	} else {
-		assertInt(t, 4, len(dict))
-		assertString(t, "A", dict["a"])
-		assertString(t, "AA", dict["aa"])
-		assertString(t, "B", dict["b"])
-		assertString(t, "BB", dict["bb"])
+		assertInt(t, 5, len(dict))
+		assertString(t, "A", dict["a"][0])
+		assertString(t, "AA", dict["aa"][0])
+		assertString(t, "B", dict["b"][0])
+		assertString(t, "BB", dict["bb"][0])
+		assertString(t, "C0", dict["cc"][0])
+		assertString(t, "C1", dict["cc"][1])
 	}
 }
 

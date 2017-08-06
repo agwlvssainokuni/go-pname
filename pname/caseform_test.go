@@ -21,27 +21,23 @@ import "testing"
 func TestToLowerCamelCase(t *testing.T) {
 	assertString(t, "", ToLowerCamelCase([]string{""}))
 	assertString(t, "abc", ToLowerCamelCase([]string{"ABC"}))
-	assertString(t, "abcDefGhi", ToLowerCamelCase([]string{"ABC DEF", "GHI"}))
-	assertString(t, "abcDefGhi", ToLowerCamelCase([]string{"  ABC  DEF  ", "  GHI  "}))
+	assertString(t, "abcDefGhi", ToLowerCamelCase([]string{"ABC", "DEF", "GHI"}))
 }
 
 func TestToUpperCamelCase(t *testing.T) {
 	assertString(t, "", ToUpperCamelCase([]string{""}))
 	assertString(t, "Abc", ToUpperCamelCase([]string{"ABC"}))
-	assertString(t, "AbcDefGhi", ToUpperCamelCase([]string{"ABC DEF", "GHI"}))
-	assertString(t, "AbcDefGhi", ToUpperCamelCase([]string{"  ABC  DEF  ", "  GHI  "}))
+	assertString(t, "AbcDefGhi", ToUpperCamelCase([]string{"ABC", "DEF", "GHI"}))
 }
 
 func TestToLowerSnakeCase(t *testing.T) {
 	assertString(t, "", ToLowerSnakeCase([]string{""}))
 	assertString(t, "abc", ToLowerSnakeCase([]string{"ABC"}))
-	assertString(t, "abc_def_ghi", ToLowerSnakeCase([]string{"ABC DEF", "GHI"}))
-	assertString(t, "abc_def_ghi", ToLowerSnakeCase([]string{"  ABC  DEF  ", "  GHI  "}))
+	assertString(t, "abc_def_ghi", ToLowerSnakeCase([]string{"ABC", "DEF", "GHI"}))
 }
 
 func TestToUpperSnakeCase(t *testing.T) {
 	assertString(t, "", ToUpperSnakeCase([]string{""}))
 	assertString(t, "ABC", ToUpperSnakeCase([]string{"abc"}))
-	assertString(t, "ABC_DEF_GHI", ToUpperSnakeCase([]string{"abc def", "ghi"}))
-	assertString(t, "ABC_DEF_GHI", ToUpperSnakeCase([]string{"  abc  def  ", "  ghi  "}))
+	assertString(t, "ABC_DEF_GHI", ToUpperSnakeCase([]string{"abc", "def", "ghi"}))
 }

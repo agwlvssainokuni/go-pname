@@ -23,12 +23,12 @@ import (
 	"strings"
 )
 
-func LoadDictFile(fname string, withHeader bool) (map[string]string, error) {
+func LoadDictFile(fname string, withHeader bool, delim string) (map[string][]string, error) {
 	if reader, err := os.Open(fname); err != nil {
 		return nil, err
 	} else {
-		var dict map[string]string
-		if dict, err = LoadDict(reader, withHeader, strings.HasSuffix(fname, ".tsv")); err != nil {
+		var dict map[string][]string
+		if dict, err = LoadDict(reader, withHeader, delim, strings.HasSuffix(fname, ".tsv")); err != nil {
 			return nil, err
 		}
 		if err = reader.Close(); err != nil {
@@ -38,8 +38,8 @@ func LoadDictFile(fname string, withHeader bool) (map[string]string, error) {
 	}
 }
 
-func LoadDict(r io.Reader, withHeader bool, tsv bool) (map[string]string, error) {
-	result := make(map[string]string)
+func LoadDict(r io.Reader, withHeader bool, delim string, tsv bool) (map[string][]string, error) {
+	result := make(map[string][]string)
 	csvr := csv.NewReader(r)
 	if tsv {
 		csvr.Comma = '\t'
@@ -57,7 +57,15 @@ func LoadDict(r io.Reader, withHeader bool, tsv bool) (map[string]string, error)
 			if len(record) < 2 {
 				continue
 			}
-			result[record[0]] = record[1]
+			tk := strings.Split(record[1], delim)
+			nm := make([]string, 0, len(tk))
+			for _, n := range tk {
+				if len(n) <= 0 {
+					continue
+				}
+				nm = append(nm, n)
+			}
+			result[record[0]] = nm
 		}
 	}
 }

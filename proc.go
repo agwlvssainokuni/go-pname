@@ -14,54 +14,61 @@
  * limitations under the License.
  */
 
-package pname
+package main
 
 import (
 	"encoding/csv"
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/agwlvssainokuni/go-pname/pname"
 )
 
-func Process(csvr *csv.Reader, csvw *csv.Writer, tokenizer Tokenizer, getPname func([]*Token) string, getDesc func([]*Token) string) (error, bool) {
+func processMain(csvr *csv.Reader, csvw *csv.Writer, tokenizer pname.Tokenizer, getPname func([]*pname.Token) string, getDesc func([]*pname.Token) string) (error, error) {
 	for {
-		if record, err := csvr.Read(); err != nil {
+
+		record, err := csvr.Read()
+		if err != nil {
 			if err != io.EOF {
-				return err, false
+				return err, nil
 			} else {
 				break
 			}
-		} else if len(record) < 1 {
+		}
+
+		if len(record) < 1 {
 			continue
-		} else {
-			ln := record[0]
-			tk := tokenizer.SplitText(ln)
-			pn := getPname(tk)
-			desc := getDesc(tk)
-			if err = csvw.Write([]string{ln, pn, desc}); err != nil {
-				return err, true
-			}
+		}
+
+		ln := record[0]
+		tk := tokenizer.SplitText(ln)
+		pn := getPname(tk)
+		desc := getDesc(tk)
+		err = csvw.Write([]string{ln, pn, desc})
+		if err != nil {
+			return nil, err
 		}
 	}
-	return nil, false
+	return nil, nil
 }
 
-func GetPnameFunc(lCamel, uCamel, lSnake, uSnake bool) func([]*Token) string {
+func getPnameFunc(lCamel, uCamel, lSnake, uSnake bool) func([]*pname.Token) string {
 	var pnameFunc func([]string) string
 	if lCamel {
-		pnameFunc = ToLowerCamelCase
+		pnameFunc = pname.ToLowerCamelCase
 	} else if uCamel {
-		pnameFunc = ToUpperCamelCase
+		pnameFunc = pname.ToUpperCamelCase
 	} else if lSnake {
-		pnameFunc = ToLowerSnakeCase
+		pnameFunc = pname.ToLowerSnakeCase
 	} else if uSnake {
-		pnameFunc = ToUpperSnakeCase
+		pnameFunc = pname.ToUpperSnakeCase
 	} else {
 		pnameFunc = func(t []string) string {
 			return strings.Join(t, " ")
 		}
 	}
-	return func(token []*Token) string {
+	return func(token []*pname.Token) string {
 		t := make([]string, 0, len(token))
 		for _, tk := range token {
 			for _, n := range tk.Name {
@@ -72,8 +79,8 @@ func GetPnameFunc(lCamel, uCamel, lSnake, uSnake bool) func([]*Token) string {
 	}
 }
 
-func GetDescFunc() func([]*Token) string {
-	return func(token []*Token) string {
+func getDescFunc() func([]*pname.Token) string {
+	return func(token []*pname.Token) string {
 		t := make([]string, 0, len(token))
 		for _, tk := range token {
 			if tk.OK {

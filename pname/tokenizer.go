@@ -22,9 +22,9 @@ import (
 )
 
 type Token struct {
-	Word string
-	Name []string
-	OK   bool
+	Lnm string
+	Pnm []string
+	OK  bool
 }
 
 type Tokenizer interface {
@@ -53,7 +53,7 @@ func (tk *DictTokenizer) SplitText(text string) []*Token {
 			unmatch = bytes.NewBuffer(make([]byte, 0, len(text)))
 		}
 		result = append(result, token)
-		i += len(token.Word) - 1
+		i += len(token.Lnm) - 1
 	}
 	if unmatch.Len() > 0 {
 		result = append(result, &Token{unmatch.String(), []string{unmatch.String()}, false})
@@ -63,22 +63,22 @@ func (tk *DictTokenizer) SplitText(text string) []*Token {
 
 func findLongestToken(text string, dict map[string][]string) *Token {
 	var (
-		word string
-		name []string
+		ln string
+		pn []string
 	)
 	length := 0
-	for w, n := range dict {
-		if len(w) <= length {
+	for l, p := range dict {
+		if len(l) <= length {
 			continue
 		}
-		if strings.HasPrefix(text, w) {
-			word = w
-			name = n
-			length = len(word)
+		if strings.HasPrefix(text, l) {
+			ln = l
+			pn = p
+			length = len(ln)
 		}
 	}
 	if length <= 0 {
 		return nil
 	}
-	return &Token{word, name, true}
+	return &Token{ln, pn, true}
 }

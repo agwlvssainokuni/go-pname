@@ -71,8 +71,8 @@ func getPnameFunc(lCamel, uCamel, lSnake, uSnake bool) func([]*pname.Token) stri
 	return func(token []*pname.Token) string {
 		t := make([]string, 0, len(token))
 		for _, tk := range token {
-			for _, n := range tk.Name {
-				t = append(t, n)
+			for _, pn := range tk.Pnm {
+				t = append(t, pn)
 			}
 		}
 		return pnameFunc(t)
@@ -84,9 +84,9 @@ func getDescFunc() func([]*pname.Token) string {
 		t := make([]string, 0, len(token))
 		for _, tk := range token {
 			if tk.OK {
-				t = append(t, fmt.Sprintf("%s=>%s", tk.Word, tk.Name))
+				t = append(t, fmt.Sprintf("%s=>%s", tk.Lnm, tk.Pnm))
 			} else {
-				t = append(t, fmt.Sprintf("%s=*", tk.Word))
+				t = append(t, fmt.Sprintf("%s=*", tk.Lnm))
 			}
 		}
 		return strings.Join(t, "|")

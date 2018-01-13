@@ -47,27 +47,27 @@ func TestSplitText(t *testing.T) {
 	dictTk := NewDictTokenizer(createDict())
 	tk1 := dictTk.SplitText("aaabbbccabc")
 	assertInt(t, 8, len(tk1))
-	assertString(t, "aa", tk1[0].Word)
+	assertString(t, "aa", tk1[0].Lnm)
 	assertBool(t, true, tk1[0].OK)
-	assertString(t, "a", tk1[1].Word)
+	assertString(t, "a", tk1[1].Lnm)
 	assertBool(t, true, tk1[1].OK)
-	assertString(t, "bb", tk1[2].Word)
+	assertString(t, "bb", tk1[2].Lnm)
 	assertBool(t, true, tk1[2].OK)
-	assertString(t, "b", tk1[3].Word)
+	assertString(t, "b", tk1[3].Lnm)
 	assertBool(t, true, tk1[3].OK)
-	assertString(t, "cc", tk1[4].Word)
+	assertString(t, "cc", tk1[4].Lnm)
 	assertBool(t, false, tk1[4].OK)
-	assertString(t, "a", tk1[5].Word)
+	assertString(t, "a", tk1[5].Lnm)
 	assertBool(t, true, tk1[5].OK)
-	assertString(t, "b", tk1[6].Word)
+	assertString(t, "b", tk1[6].Lnm)
 	assertBool(t, true, tk1[6].OK)
-	assertString(t, "c", tk1[7].Word)
+	assertString(t, "c", tk1[7].Lnm)
 	assertBool(t, false, tk1[7].OK)
 }
 
 func assertFindLongestToken(t *testing.T, dict map[string][]string, text string, expected string) {
 	r := findLongestToken(text, dict)
-	if r.Word != expected {
+	if r.Lnm != expected {
 		t.Errorf("should be %s for %s", expected, text)
 	}
 }

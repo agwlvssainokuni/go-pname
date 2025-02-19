@@ -18,6 +18,13 @@ package pname
 
 import (
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+)
+
+var (
+	title = cases.Title(language.Und)
 )
 
 func ToLowerCamelCase(text []string) string {
@@ -28,7 +35,7 @@ func ToLowerCamelCase(text []string) string {
 			r = append(r, strings.ToLower(t))
 			first = false
 		} else {
-			r = append(r, strings.Title(strings.ToLower(t)))
+			r = append(r, title.String(strings.ToLower(t)))
 		}
 	}
 	return strings.Join(r, "")
@@ -37,7 +44,7 @@ func ToLowerCamelCase(text []string) string {
 func ToUpperCamelCase(text []string) string {
 	r := make([]string, 0, len(text))
 	for _, t := range text {
-		r = append(r, strings.Title(strings.ToLower(t)))
+		r = append(r, title.String(strings.ToLower(t)))
 	}
 	return strings.Join(r, "")
 }

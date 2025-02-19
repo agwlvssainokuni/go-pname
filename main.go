@@ -151,7 +151,6 @@ func main() {
 			ok := procFile(fname)
 			if !ok {
 				os.Exit(-1)
-				break
 			}
 		}
 	}

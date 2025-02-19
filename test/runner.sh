@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017 agwlvssainokuni
+# Copyright 2017,2025 agwlvssainokuni
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-basedir=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
+basedir=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 # (0) ビルドする。
 cd ${basedir}
-pushd ..; go build; popd
+pushd .. && go build && popd
 
 # (1) 物理名生成する。
 ../go-pname -d dict.tsv -o result.tsv lname.tsv
@@ -30,4 +30,4 @@ echo "END  {diff -u expected.tsv result.tsv}"
 
 # (3) 後片付けする。
 rm -f result.tsv
-pushd ..; go clean; popd
+pushd .. && go clean && popd
